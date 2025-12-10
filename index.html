@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>M.R.H ID Apply</title>
+  <!-- Font Awesome (for icon) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{
+      --pink:#ff4da6;
+      --bg:#fff6fb;
+      --card-bg:#ffffff;
+      --muted:#666;
+      --radius:12px;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+    body{
+      background: linear-gradient(180deg, #fffafc 0%, #fff2f8 100%);
+      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:20px; position:relative;
+    }
+    .container{
+      width:100%; max-width:780px; background:var(--card-bg); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.08);
+      padding:26px; position:relative;
+    }
+    h1{ text-align:center; margin:0 0 18px; font-size:26px; color:var(--pink); letter-spacing:1px }
+    form{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+    label{ display:block; font-size:13px; color:var(--muted); margin-bottom:6px }
+    input[type="text"], input[type="email"], input[type="date"], select{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid #eee; box-sizing:border-box;
+      background:#fff; font-size:14px;
+    }
+    .full{ grid-column: 1 / -1; }
+    .captcha-row{ display:flex; gap:10px; align-items:center; }
+    .captcha-box{ padding:10px 14px; border-radius:8px; background:#fdf0f9; border:1px dashed #ffd7ef; font-weight:700; letter-spacing:3px; }
+    .btn{
+      background:var(--pink); color:white; border:none; padding:11px 16px; border-radius:10px; cursor:pointer; font-weight:600;
+    }
+    .btn:disabled{ opacity:0.6; cursor:not-allowed }
+    .message-page{ display:none; text-align:center; padding:30px }
+    .muted{ color:var(--muted); font-size:13px }
+    .small{ font-size:13px }
+    .back-btn{ margin-top:16px; background:#fff; color:var(--pink); border:1px solid var(--pink); padding:8px 12px; border-radius:8px; cursor:pointer }
+    footer{ margin-top:12px; text-align:center; color:var(--muted); font-size:13px }
+    @media (max-width:640px){
+      form{ grid-template-columns: 1fr; }
+    }
+    /* Help icon */
+    .help-icon{
+      position:absolute;
+      top:15px;
+      right:15px;
+      font-size:22px;
+      color:var(--pink);
+      text-decoration:none;
+      transition:0.2s;
+    }
+    .help-icon:hover{
+      color:#d63384;
+      transform:scale(1.1);
+    }
+  </style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Help Line Icon -->
+    <a href="https://mrhonlineauthority.github.io/mrhhelplinehome/" target="_blank" class="help-icon" title="Help Line">
+      <i class="fas fa-headset"></i>
+    </a>
+
+    <h1>M.R.H ID Apply</h1>
+
+    <div id="form-wrap">
+      <form id="mrhForm" autocomplete="off">
+        <div class="full">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" required />
+        </div>
+
+        <div>
+          <label for="nationality">Nationality</label>
+          <input id="nationality" name="nationality" type="text" required placeholder="বাংলাদেশ / অন্য" />
+        </div>
+
+        <div>
+          <label for="religion">Religion</label>
+          <input id="religion" name="religion" type="text" required />
+        </div>
+
+        <div>
+          <label for="division">Division</label>
+          <select id="division" name="division" required>
+            <option value="">-- নির্বাচন করুন --</option>
+            <option>Dhaka</option>
+            <option>Sylhet</option>
+            <option>Barishal</option>
+            <option>Rangpur</option>
+            <option>Maymanshin</option>
+            <option>Rajshahi</option>
+            <option>Jashore</option>
+            <option>Chattogram</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="district">District</label>
+          <input id="district" name="district" type="text" required />
+        </div>
+
+        <div>
+          <label for="upazila">Upazila</label>
+          <input id="upazila" name="upazila" type="text" required />
+        </div>
+
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required />
+        </div>
+
+        <div>
+          <label for="dob">Date Of Birth</label>
+          <input id="dob" name="dob" type="date" required />
+        </div>
+
+        <div class="full">
+          <label>CAPTCHA — নিচে দেখানো কোডটি টাইপ করুন</label>
+          <div class="captcha-row">
+            <div id="captchaBox" class="captcha-box">ABC123</div>
+            <input id="captchaInput" placeholder="CAPTCHA কোড লিখুন" />
+            <button type="button" id="regenCaptcha" class="btn" style="background:#fff;color:var(--pink);border:1px solid var(--pink)">Regenerate</button>
+          </div>
+        </div>
+
+        <div class="full" style="display:flex; gap:10px; justify-content:flex-end; align-items:center;">
+          <div class="muted small" style="flex:1">প্রতিটি সাবমিশন আলাদা CAPTCHA কোড থাকবে — সঠিক লিখতে হবে।</div>
+          <button id="applyBtn" class="btn" type="submit">Apply</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="messagePage" class="message-page">
+      <h2 id="msgTitle"></h2>
+      <p id="msgBody" class="muted"></p>
+      <button id="backBtn" class="back-btn">Back to Form</button>
+    </div>
+
+    <footer>প্রশ্ন/যোগাযোগ: mdriadhassan5050@gmail.com</footer>
+  </div>
+
+<script>
+/* =========================
+   CONFIGURE EMAILJS HERE
+   ========================= */
+const EMAILJS_SERVICE_ID = "service_5ngkrk9";    
+const EMAILJS_TEMPLATE_ID = "template_dpoy4iu";  
+const EMAILJS_PUBLIC_KEY  = "ZVCWP6Lr36JRVmrJx";   
+const TARGET_EMAIL = "mdriadhassan5050@gmail.com"; 
+
+if(window.emailjs){
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+}
+
+/* =========================
+   Helper & UI logic
+   ========================= */
+const form = document.getElementById('mrhForm');
+const captchaBox = document.getElementById('captchaBox');
+const captchaInput = document.getElementById('captchaInput');
+const regenCaptcha = document.getElementById('regenCaptcha');
+const messagePage = document.getElementById('messagePage');
+const formWrap = document.getElementById('form-wrap');
+const msgTitle = document.getElementById('msgTitle');
+const msgBody = document.getElementById('msgBody');
+const backBtn = document.getElementById('backBtn');
+
+function genCaptcha(len=6){
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
+  let s="";
+  for(let i=0;i<len;i++) s += chars.charAt(Math.floor(Math.random()*chars.length));
+  return s;
+}
+function showCaptcha(){
+  captchaBox.textContent = genCaptcha(6);
+  captchaInput.value = "";
+}
+regenCaptcha.addEventListener('click', showCaptcha);
+showCaptcha();
+
+/* LocalStorage key */
+const STORAGE_KEY = "mrh_submissions_v1";
+
+/* build unique key */
+function submissionKey(data){
+  const keyObj = {
+    name: data.name.trim().toLowerCase(),
+    nationality: data.nationality.trim().toLowerCase(),
+    religion: data.religion.trim().toLowerCase(),
+    division: data.division.trim().toLowerCase(),
+    district: data.district.trim().toLowerCase(),
+    upazila: data.upazila.trim().toLowerCase(),
+    email: data.email.trim().toLowerCase(),
+    dob: data.dob
+  };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(keyObj))));
+}
+
+function getSubmissions(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function saveSubmissionRecord(record){
+  const arr = getSubmissions();
+  arr.push(record);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+/* send email using EmailJS */
+function sendEmail(data){
+  const templateParams = {
+    name: data.name,
+    nationality: data.nationality,
+    religion: data.religion,
+    division: data.division,
+    district: data.district,
+    upazila: data.upazila,
+    email: data.email,
+    dob: data.dob,
+    captcha: data.captcha,
+    to_email: TARGET_EMAIL 
+  };
+
+  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+}
+
+/* show message page */
+function showMessage(title, body){
+  formWrap.style.display = "none";
+  messagePage.style.display = "block";
+  msgTitle.textContent = title;
+  msgBody.textContent = body;
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* restore form */
+function backToForm(){
+  messagePage.style.display = "none";
+  formWrap.style.display = "block";
+  showCaptcha();
+  form.reset();
+}
+
+/* calculate days difference */
+function daysBetween(ts1, ts2){
+  return Math.floor((ts2 - ts1) / (1000*60*60*24));
+}
+
+/* form submit handling */
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  const data = {
+    name: document.getElementById('name').value || "",
+    nationality: document.getElementById('nationality').value || "",
+    religion: document.getElementById('religion').value || "",
+    division: document.getElementById('division').value || "",
+    district: document.getElementById('district').value || "",
+    upazila: document.getElementById('upazila').value || "",
+    email: document.getElementById('email').value || "",
+    dob: document.getElementById('dob').value || "",
+    captcha: (captchaInput.value || "").trim()
+  };
+
+  if(!data.name || !data.email || !data.dob || !data.division){
+    alert("অনুগ্রহ করে সব প্রয়োজনীয় ফিল্ড পূরণ করুন।");
+    return;
+  }
+
+  if(!(data.captcha && data.captcha.toUpperCase() === captchaBox.textContent.toUpperCase())){
+    alert("CAPTCHA ভুল হয়েছে। সঠিক কোড দিন বা Regenerate করুন।");
+    showCaptcha();
+    return;
+  }
+
+  const key = submissionKey(data);
+  const records = getSubmissions();
+  const existing = records.find(r=> r.key === key);
+
+  const nowTs = Date.now();
+
+  if(!existing){
+    sendEmail(data).then(()=> {
+      saveSubmissionRecord({ key, ts: nowTs, data });
+      showMessage("ফ্রম সঠিক ভাবে সাবমিট হয়েছে ৩ দিন অপেক্ষা করুন", 
+                  "আপনার ফরমটি সঠিকভাবে সাবমিট করা হয়েছে। অনুগ্রহ করে ৩ দিন অপেক্ষা করুন।");
+    }).catch(err=>{
+      console.error(err);
+      saveSubmissionRecord({ key, ts: nowTs, data });
+      showMessage("ফরম সাবমিট হয়েছে (ইমেইল পাঠানো হয়নি)", 
+                  "আপনার ফরম লোকালি সেভ হয়েছে; ইমেইল পাঠাতে সমস্যা হয়েছে। পরে পুনরায় চেষ্টা করুন।");
+    });
+
+  } else {
+    const days = daysBetween(existing.ts, nowTs);
+
+    if(days < 3){
+      showMessage("আপনি ওয়েট লিস্টে রয়েছেন", "আপনি ওয়েট লিস্টে রয়েছেন দয়া করে অপেক্ষা করুন");
+    } else {
+      sendEmail(data).then(()=>{
+        saveSubmissionRecord({ key, ts: nowTs, data });
+        showMessage("আপনার আইডি কার্ড তৈরি হয়নি", "আপনার আইডি কার্ড তৈরি হয়নি আবার এপ্লাই করুন। এবং আমাদের সাথে যোগ করুন mdriadhassan5050@gmail.com এই জিমেইলে");
+      }).catch(err=>{
+        console.error(err);
+        saveSubmissionRecord({ key, ts: nowTs, data });
+        showMessage("আপনার আইডি কার্ড তৈরি হয়নি (ইমেইল পাঠাতে সমস্যা)", "আপনার আইডি কার্ড তৈরি হয়নি। আবার এপ্লাই করুন এবং যোগাযোগ করুন mdriadhassan5050@gmail.com");
+      });
+    }
+  }
+});
+
+backBtn.addEventListener('click', backToForm);
+</script>
+</body>
+  </html>
