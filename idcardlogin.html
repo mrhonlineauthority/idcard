@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRH ID Card System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .header h2 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: #ecf0f1;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            color: #3498db;
+            margin-right: 10px;
+        }
+
+        /* Page Styles */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .login-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #7f8c8d;
+            padding: 4px;
+        }
+
+        .password-toggle:hover {
+            color: #3498db;
+        }
+
+        .login-btn {
+            background: linear-gradient(90deg, #2980b9, #3498db);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(90deg, #1c5a80, #2980b9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .forgot-password a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        /* Profile Page Styles */
+        .profile-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .profile-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        /* Profile Table */
+        .profile-table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        .profile-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-table th {
+            background: linear-gradient(90deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .profile-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .profile-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .profile-table tr:nth-child(even) {
+            background: #f0f2f5;
+        }
+
+        /* Profile Actions */
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        .action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 200px;
+        }
+
+        .preview-btn {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .preview-btn:hover {
+            background: linear-gradient(90deg, #2980b9, #1c5a80);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .logout-btn {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(90deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ID Card Preview Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+
+        /* ID Card Styles */
+        .id-card-preview {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .id-card-header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .id-card-header h3 {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 3px;
+            line-height: 1.2;
+        }
+
+        .id-card-header h4 {
+            font-size: 1.1rem;
+            color: #3498db;
+            font-weight: 500;
+            line-height: 1.2;
+        }
+
+        .id-number {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e74c3c;
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 12px 0;
+            letter-spacing: 1px;
+            border: 1px dashed #ddd;
+        }
+
+        .id-card-body {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .id-card-field {
+            margin-bottom: 10px;
+        }
+
+        .id-card-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .id-card-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+
+        /* Print Button in Modal */
+        .print-btn-container {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .print-card-btn {
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 180px;
+        }
+
+        .print-card-btn:hover {
+            background: linear-gradient(90deg, #219653, #27ae60);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .print-card-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Print Styles - OPTIMIZED FOR A4 LANDSCAPE */
+        @media print {
+            body * {
+                visibility: hidden;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .modal.active, .modal.active * {
+                visibility: visible;
+            }
+            
+            .modal.active {
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+                overflow: visible !important;
+            }
+            
+            .modal-header, .close-modal, .print-btn-container {
+                display: none !important;
+            }
+            
+            .modal-content {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                height: 100% !important;
+                overflow: visible !important;
+            }
+            
+            .id-card-preview {
+                box-shadow: none !important;
+                border: 2px solid #ddd !important;
+                position: absolute !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: 90% !important;
+                max-width: 650px !important;
+                padding: 20px !important;
+                margin: 0 !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
+            }
+            
+            /* Optimize font sizes for print */
+            .id-card-header h3 {
+                font-size: 1.6rem !important;
+                margin-bottom: 5px !important;
+            }
+            
+            .id-card-header h4 {
+                font-size: 1.3rem !important;
+            }
+            
+            .id-number {
+                font-size: 1.2rem !important;
+                padding: 10px !important;
+                margin: 15px 0 !important;
+            }
+            
+            .id-card-label {
+                font-size: 0.85rem !important;
+            }
+            
+            .id-card-value {
+                font-size: 1rem !important;
+            }
+            
+            .id-card-body {
+                gap: 15px !important;
+                margin-bottom: 20px !important;
+            }
+            
+            @page {
+                margin: 15mm !important;
+                size: A4 landscape !important;
+            }
+            
+            /* Remove any background colors for better print */
+            .id-number {
+                background: #f9f9f9 !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            /* Ensure borders print correctly */
+            .id-card-preview {
+                border-color: #000 !important;
+            }
+            
+            .id-number {
+                border-color: #999 !important;
+            }
+            
+            .id-card-header {
+                border-color: #3498db !important;
+            }
+        }
+
+        /* Message Styles */
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info-message {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .profile-actions {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+            
+            .id-card-body {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            .id-card-preview {
+                padding: 12px;
+            }
+            
+            .id-card-header h3 {
+                font-size: 1.2rem;
+            }
+            
+            .id-card-header h4 {
+                font-size: 1rem;
+            }
+            
+            .id-number {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+        <!-- Message Display -->
+        <div class="message" id="message"></div>
+
+        <!-- Login Page -->
+        <div class="page active" id="login-page">
+            <div class="login-container">
+                <div class="login-card">
+                    <h2 class="login-title">Login to Your ID Card</h2>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-email">Email Address</label>
+                            <div class="input-with-icon">
+                                <input type="email" id="login-email" placeholder="Enter your registered email" required>
+                                <i class="fas fa-envelope input-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <div class="input-with-icon">
+                                <input type="password" id="login-password" placeholder="Enter your password" required>
+                                <button type="button" class="password-toggle" id="login-password-toggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="login-btn" id="login-btn">
+                            <i class="fas fa-sign-in-alt"></i> Login to Profile
+                        </button>
+                    </form>
+                    
+                    <div class="forgot-password">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div class="page" id="profile-page">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <h2 class="profile-title">Your Profile</h2>
+                    <div class="user-info">
+                        <div class="user-avatar" id="user-avatar">U</div>
+                        <div class="user-name" id="user-name">User</div>
+                    </div>
+                </div>
+                
+                <div class="profile-table-container">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th>Information</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Name</strong></td>
+                                <td id="profile-name">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>ID Number</strong></td>
+                                <td id="profile-id">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Date of Birth</strong></td>
+                                <td id="profile-dob">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email</strong></td>
+                                <td id="profile-email">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Registration Date</strong></td>
+                                <td id="profile-reg-date">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nationality</strong></td>
+                                <td id="profile-nationality">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Religion</strong></td>
+                                <td id="profile-religion">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sex</strong></td>
+                                <td id="profile-sex">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Blood Group</strong></td>
+                                <td id="profile-blood-group">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Division</strong></td>
+                                <td id="profile-division">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>District</strong></td>
+                                <td id="profile-district">-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Upazila</strong></td>
+                                <td id="profile-upazila">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="profile-actions">
+                    <button class="action-btn preview-btn" id="preview-card-btn">
+                        <i class="fas fa-eye"></i> Preview Card
+                    </button>
+                    <button class="action-btn logout-btn" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ID Card Preview Modal -->
+        <div class="modal" id="id-card-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">ID Card Preview</h3>
+                    <button class="close-modal" id="close-modal">&times;</button>
+                </div>
+                <div class="id-card-preview" id="id-card-preview">
+                    <!-- ID Card content will be inserted here -->
+                </div>
+                
+                <div class="print-btn-container">
+                    <button class="print-card-btn" id="print-card-btn">
+                        <i class="fas fa-print"></i> Print Card
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getDatabase, 
+            ref, 
+            get, 
+            query, 
+            orderByChild, 
+            equalTo
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9ox4Vi5WhXzaTh8i0oKuM6xKLtt3feKU",
+            authDomain: "mrh-registration-94156.firebaseapp.com",
+            databaseURL: "https://mrh-registration-94156-default-rtdb.firebaseio.com",
+            projectId: "mrh-registration-94156",
+            storageBucket: "mrh-registration-94156.firebasestorage.app",
+            messagingSenderId: "1054623307007",
+            appId: "1:1054623307007:web:d88da72217b672518f68ca",
+            measurementId: "G-6NJKR4H8MR"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const profilePage = document.getElementById('profile-page');
+        const messageDiv = document.getElementById('message');
+        const pageSubtitle = document.getElementById('page-subtitle');
+        
+        // Login elements
+        const loginForm = document.getElementById('login-form');
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        const loginPasswordToggle = document.getElementById('login-password-toggle');
+        const loginBtn = document.getElementById('login-btn');
+        
+        // Profile elements
+        const userAvatar = document.getElementById('user-avatar');
+        const userName = document.getElementById('user-name');
+        const profileName = document.getElementById('profile-name');
+        const profileId = document.getElementById('profile-id');
+        const profileDob = document.getElementById('profile-dob');
+        const profileEmail = document.getElementById('profile-email');
+        const profileRegDate = document.getElementById('profile-reg-date');
+        const profileNationality = document.getElementById('profile-nationality');
+        const profileReligion = document.getElementById('profile-religion');
+        const profileSex = document.getElementById('profile-sex');
+        const profileBloodGroup = document.getElementById('profile-blood-group');
+        const profileDivision = document.getElementById('profile-division');
+        const profileDistrict = document.getElementById('profile-district');
+        const profileUpazila = document.getElementById('profile-upazila');
+        const previewCardBtn = document.getElementById('preview-card-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        // Modal elements
+        const idCardModal = document.getElementById('id-card-modal');
+        const idCardPreview = document.getElementById('id-card-preview');
+        const closeModal = document.getElementById('close-modal');
+        const printCardBtn = document.getElementById('print-card-btn');
+
+        // Current user data
+        let currentUserData = null;
+        let currentUserId = null;
+
+        // Password toggle functionality
+        function setupPasswordToggle(inputId, toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                const input = document.getElementById(inputId);
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Switch page
+        function switchPage(pageToShow) {
+            // Hide all pages
+            loginPage.classList.remove('active');
+            profilePage.classList.remove('active');
+            
+            // Show selected page
+            if (pageToShow === 'login') {
+                loginPage.classList.add('active');
+                pageSubtitle.textContent = 'ID Card System - Login';
+            } else if (pageToShow === 'profile') {
+                profilePage.classList.add('active');
+                pageSubtitle.textContent = 'ID Card System - Profile';
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            if (!isNaN(date.getTime())) {
+                return date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            }
+            return dateString;
+        }
+
+        // Update profile display
+        function updateProfileDisplay(userData, userId) {
+            // Update avatar with first letter of name
+            const firstLetter = userData.name ? userData.name.charAt(0).toUpperCase() : 'U';
+            userAvatar.textContent = firstLetter;
+            
+            // Update user name
+            userName.textContent = userData.name || 'User';
+            
+            // Update profile table
+            profileName.textContent = userData.name || '-';
+            profileId.textContent = userId || '-';
+            profileDob.textContent = formatDate(userData.dob) || '-';
+            profileEmail.textContent = userData.email || '-';
+            profileRegDate.textContent = formatDate(userData.registrationDate) || '-';
+            profileNationality.textContent = userData.nationality || '-';
+            profileReligion.textContent = userData.religion || '-';
+            profileSex.textContent = userData.sex || '-';
+            profileBloodGroup.textContent = userData.bloodGroup || '-';
+            profileDivision.textContent = userData.division || '-';
+            profileDistrict.textContent = userData.district || '-';
+            profileUpazila.textContent = userData.upazila || '-';
+            
+            // Store current user data
+            currentUserData = userData;
+            currentUserId = userId;
+        }
+
+        // Create ID Card HTML for preview - OPTIMIZED FOR PRINT
+        function createIDCardHTML(userData, userId) {
+            return `
+                <div class="id-card-header">
+                    <h3>M.R.H Online Registration Authority</h3>
+                    <h4>OFFICIAL ID CARD</h4>
+                </div>
+                
+                <div class="id-number">ID: ${userId}</div>
+                
+                <div class="id-card-body">
+                    <div class="id-card-field">
+                        <div class="id-card-label">Full Name</div>
+                        <div class="id-card-value">${userData.name || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Nationality</div>
+                        <div class="id-card-value">${userData.nationality || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Date of Birth</div>
+                        <div class="id-card-value">${formatDate(userData.dob) || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Email Address</div>
+                        <div class="id-card-value">${userData.email || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Religion</div>
+                        <div class="id-card-value">${userData.religion || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Sex</div>
+                        <div class="id-card-value">${userData.sex || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Blood Group</div>
+                        <div class="id-card-value">${userData.bloodGroup || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Division</div>
+                        <div class="id-card-value">${userData.division || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">District</div>
+                        <div class="id-card-value">${userData.district || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Upazila</div>
+                        <div class="id-card-value">${userData.upazila || 'Not Provided'}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Issue Date</div>
+                        <div class="id-card-value">${formatDate(userData.issueDate) || formatDate(new Date().toISOString())}</div>
+                    </div>
+                    <div class="id-card-field">
+                        <div class="id-card-label">Registration Date</div>
+                        <div class="id-card-value">${formatDate(userData.registrationDate) || 'Not Provided'}</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 15px; color: #7f8c8d; font-size: 0.85rem; line-height: 1.2;">
+                    This is an official document issued by M.R.H Online Registration Authority
+                </div>
+            `;
+        }
+
+        // Print ID Card - OPTIMIZED
+        function printIDCard() {
+            // Store original button text
+            const originalText = printCardBtn.innerHTML;
+            printCardBtn.innerHTML = '<div class="loading"></div> Preparing to print...';
+            printCardBtn.disabled = true;
+
+            // Add a small delay to ensure DOM updates
+            setTimeout(() => {
+                try {
+                    // Ensure the modal is fully visible
+                    idCardModal.style.display = 'flex';
+                    idCardModal.style.opacity = '1';
+                    
+                    // Print the modal content
+                    window.print();
+                    
+                    // Show success message after a delay
+                    setTimeout(() => {
+                        showMessage('Print dialog opened. Card is optimized for A4 landscape printing.', 'success');
+                    }, 300);
+                } catch (error) {
+                    console.error('Print error:', error);
+                    showMessage('Print failed. Please try again or check your print settings.', 'error');
+                } finally {
+                    // Reset button state after a delay
+                    setTimeout(() => {
+                        printCardBtn.innerHTML = '<i class="fas fa-print"></i> Print Card';
+                        printCardBtn.disabled = false;
+                    }, 1500);
+                }
+            }, 100);
+        }
+
+        // Initialize password toggle
+        setupPasswordToggle('login-password', loginPasswordToggle);
+
+        // Login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value;
+            
+            if (!email || !password) {
+                showMessage('Please enter both email and password', 'error');
+                return;
+            }
+            
+            // Disable login button
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<div class="loading"></div> Logging in...';
+            
+            try {
+                // Sign in with Firebase Authentication
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Get user data from Realtime Database
+                const usersRef = ref(database, 'users');
+                const emailQuery = query(usersRef, orderByChild('email'), equalTo(email));
+                const snapshot = await get(emailQuery);
+                
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    const userId = Object.keys(users)[0];
+                    const userData = users[userId];
+                    
+                    // Update profile display
+                    updateProfileDisplay(userData, userId);
+                    
+                    // Switch to profile page
+                    switchPage('profile');
+                    
+                    showMessage('Login successful! Welcome to your profile.', 'success');
+                    
+                    // Clear login form
+                    loginForm.reset();
+                } else {
+                    showMessage('User data not found. Please contact MRH Authority.', 'error');
+                    await signOut(auth);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                if (error.code === 'auth/invalid-credential') {
+                    showMessage('Invalid email or password', 'error');
+                } else if (error.code === 'auth/user-not-found') {
+                    showMessage('User not found. Please contact MRH Authority.', 'error');
+                } else if (error.code === 'auth/wrong-password') {
+                    showMessage('Incorrect password', 'error');
+                } else if (error.code === 'auth/too-many-requests') {
+                    showMessage('Too many failed attempts. Please try again later.', 'error');
+                } else {
+                    showMessage('Login failed: ' + error.message, 'error');
+                }
+            } finally {
+                // Re-enable login button
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Profile';
+            }
+        });
+
+        // Preview ID Card
+        previewCardBtn.addEventListener('click', () => {
+            if (currentUserData && currentUserId) {
+                // Create ID card HTML
+                idCardPreview.innerHTML = createIDCardHTML(currentUserData, currentUserId);
+                
+                // Show modal
+                idCardModal.classList.add('active');
+                
+                showMessage('ID Card preview loaded. Click "Print Card" for A4 landscape printing.', 'info');
+            } else {
+                showMessage('No user data available', 'error');
+            }
+        });
+
+        // Print Card button
+        printCardBtn.addEventListener('click', printIDCard);
+
+        // Close modal
+        closeModal.addEventListener('click', () => {
+            idCardModal.classList.remove('active');
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                currentUserData = null;
+                currentUserId = null;
+                switchPage('login');
+                showMessage('Logged out successfully', 'success');
+            } catch (error) {
+                console.error('Logout error:', error);
+                showMessage('Logout failed: ' + error.message, 'error');
+            }
+        });
+
+        // Close modal on outside click
+        idCardModal.addEventListener('click', (e) => {
+            if (e.target === idCardModal) {
+                idCardModal.classList.remove('active');
+            }
+        });
+
+        // Check auth state on page load
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in
+                try {
+                    // Get user data from database
+                    const usersRef = ref(database, 'users');
+                    const emailQuery = query(usersRef, orderByChild('email'), equalTo(user.email));
+                    const snapshot = await get(emailQuery);
+                    
+                    if (snapshot.exists()) {
+                        const users = snapshot.val();
+                        const userId = Object.keys(users)[0];
+                        const userData = users[userId];
+                        
+                        updateProfileDisplay(userData, userId);
+                        switchPage('profile');
+                    } else {
+                        showMessage('User data not found. Please contact MRH Authority.', 'error');
+                        await signOut(auth);
+                        switchPage('login');
+                    }
+                } catch (error) {
+                    console.error('Auth state error:', error);
+                    switchPage('login');
+                }
+            } else {
+                // User is signed out
+                switchPage('login');
+            }
+        });
+
+        // Initial welcome message
+        showMessage('Welcome to MRH ID Card System. Please login with your registered credentials.', 'info');
+        
+        // Start with login page
+        switchPage('login');
+    </script>
+</body>
+</html>
