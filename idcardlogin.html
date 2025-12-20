@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MRH ID Card System</title>
+    <title>MRH ID Card Login System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
@@ -735,7 +735,7 @@
         <div class="page" id="profile-page">
             <div class="profile-container">
                 <div class="profile-header">
-                    <h2 class="profile-title">Your Profile</h2>
+                    <h2 class="profile-title">ID Card Profile</h2>
                     <div class="user-info">
                         <div class="user-avatar" id="user-avatar">U</div>
                         <div class="user-name" id="user-name">User</div>
@@ -923,28 +923,34 @@
 
         // Show message
         function showMessage(text, type) {
+            if (!messageDiv) {
+                console.warn('Message div not found');
+                return;
+            }
             messageDiv.textContent = text;
             messageDiv.className = `message ${type}-message`;
             messageDiv.style.display = 'block';
             
             setTimeout(() => {
-                messageDiv.style.display = 'none';
+                if (messageDiv) {
+                    messageDiv.style.display = 'none';
+                }
             }, 5000);
         }
 
         // Switch page
         function switchPage(pageToShow) {
             // Hide all pages
-            loginPage.classList.remove('active');
-            profilePage.classList.remove('active');
+            if (loginPage) loginPage.classList.remove('active');
+            if (profilePage) profilePage.classList.remove('active');
             
             // Show selected page
             if (pageToShow === 'login') {
-                loginPage.classList.add('active');
-                pageSubtitle.textContent = 'ID Card System - Login';
+                if (loginPage) loginPage.classList.add('active');
+                if (pageSubtitle) pageSubtitle.textContent = 'ID Card System - Login';
             } else if (pageToShow === 'profile') {
-                profilePage.classList.add('active');
-                pageSubtitle.textContent = 'ID Card System - Profile';
+                if (profilePage) profilePage.classList.add('active');
+                if (pageSubtitle) pageSubtitle.textContent = 'ID Card System - Profile';
             }
         }
 
@@ -963,33 +969,47 @@
 
         // Update profile display
         function updateProfileDisplay(userData, userId) {
-            // Update avatar with first letter of name
-            const firstLetter = userData.name ? userData.name.charAt(0).toUpperCase() : 'U';
-            userAvatar.textContent = firstLetter;
+            // Check if elements exist before updating
+            if (!userAvatar || !userName) {
+                console.warn('Profile elements not found');
+                return;
+            }
             
-            // Update user name
-            userName.textContent = userData.name || 'User';
-            
-            // Update profile table
-            profileName.textContent = userData.name || '-';
-            profileId.textContent = userId || '-';
-            profileDob.textContent = formatDate(userData.dob) || '-';
-            profileEmail.textContent = userData.email || '-';
-            profileRegDate.textContent = formatDate(userData.registrationDate) || '-';
-            profileNationality.textContent = userData.nationality || '-';
-            profileReligion.textContent = userData.religion || '-';
-            profileSex.textContent = userData.sex || '-';
-            profileBloodGroup.textContent = userData.bloodGroup || '-';
-            profileDivision.textContent = userData.division || '-';
-            profileDistrict.textContent = userData.district || '-';
-            profileUpazila.textContent = userData.upazila || '-';
-            
-            // Store current user data
-            currentUserData = userData;
-            currentUserId = userId;
+            try {
+                // Update avatar with first letter of name
+                const firstLetter = userData.name ? userData.name.charAt(0).toUpperCase() : 'U';
+                userAvatar.textContent = firstLetter;
+                
+                // Update user name
+                userName.textContent = userData.name || 'User';
+                
+                // Safely update profile table with null checks
+                const updateIfExists = (element, value) => {
+                    if (element) element.textContent = value || '-';
+                };
+                
+                updateIfExists(profileName, userData.name);
+                updateIfExists(profileId, userId);
+                updateIfExists(profileDob, formatDate(userData.dob));
+                updateIfExists(profileEmail, userData.email);
+                updateIfExists(profileRegDate, formatDate(userData.registrationDate));
+                updateIfExists(profileNationality, userData.nationality);
+                updateIfExists(profileReligion, userData.religion);
+                updateIfExists(profileSex, userData.sex);
+                updateIfExists(profileBloodGroup, userData.bloodGroup);
+                updateIfExists(profileDivision, userData.division);
+                updateIfExists(profileDistrict, userData.district);
+                updateIfExists(profileUpazila, userData.upazila);
+                
+                // Store current user data
+                currentUserData = userData;
+                currentUserId = userId;
+            } catch (error) {
+                console.error('Error updating profile display:', error);
+            }
         }
 
-        // Create ID Card HTML for preview - OPTIMIZED FOR PRINT
+        // Create ID Card HTML for preview
         function createIDCardHTML(userData, userId) {
             return `
                 <div class="id-card-header">
@@ -1055,7 +1075,7 @@
             `;
         }
 
-        // Print ID Card - OPTIMIZED
+        // Print ID Card
         function printIDCard() {
             // Store original button text
             const originalText = printCardBtn.innerHTML;
@@ -1181,14 +1201,21 @@
             idCardModal.classList.remove('active');
         });
 
-        // Logout
+        // Logout - FIXED VERSION
         logoutBtn.addEventListener('click', async () => {
             try {
                 await signOut(auth);
                 currentUserData = null;
                 currentUserId = null;
-                switchPage('login');
+                
+                // Show success message first
                 showMessage('Logged out successfully', 'success');
+                
+                // Wait for message to show, then switch page
+                setTimeout(() => {
+                    switchPage('login');
+                }, 800);
+                
             } catch (error) {
                 console.error('Logout error:', error);
                 showMessage('Logout failed: ' + error.message, 'error');
