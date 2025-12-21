@@ -6,7 +6,110 @@
     <title>MRH Online Registration Authority</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Previous CSS remains the same until the card-footer section */
+        /* Previous CSS remains the same until the password rules section */
+
+        /* Password Rules Styles */
+        .password-rules {
+            margin-top: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+        }
+
+        .password-rules h5 {
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .rule-list {
+            list-style-type: none;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .rule-icon {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.7rem;
+        }
+
+        .rule-icon.valid {
+            background: #27ae60;
+            color: white;
+        }
+
+        .rule-icon.invalid {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .rule-icon.pending {
+            background: #bdc3c7;
+            color: white;
+        }
+
+        .rule-text {
+            flex: 1;
+        }
+
+        /* Password Strength Meter */
+        .password-strength {
+            margin-top: 10px;
+        }
+
+        .strength-meter {
+            height: 5px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .strength-bar.weak {
+            background: #e74c3c;
+            width: 25%;
+        }
+
+        .strength-bar.fair {
+            background: #f39c12;
+            width: 50%;
+        }
+
+        .strength-bar.good {
+            background: #3498db;
+            width: 75%;
+        }
+
+        .strength-bar.strong {
+            background: #27ae60;
+            width: 100%;
+        }
+
+        .strength-text {
+            font-size: 0.8rem;
+            text-align: right;
+            color: #7f8c8d;
+        }
 
         /* Card Footer Styles */
         .card-footer {
@@ -125,7 +228,9 @@
             .button-container,
             .registration-complete,
             #back-btn,
-            .login-btn {
+            .login-btn,
+            .password-rules,
+            .password-strength {
                 display: none !important;
             }
             
@@ -442,7 +547,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .btn:disabled {
+        .btn-submit:disabled {
             background: #95a5a6;
             cursor: not-allowed;
             transform: none;
@@ -882,19 +987,61 @@
                         <div class="form-group">
                             <label for="password">Password</label>
                             <div class="password-container">
-                                <input type="password" id="password" placeholder="Create a password" required minlength="6">
+                                <input type="password" id="password" placeholder="Create a strong password" required minlength="8">
                                 <button type="button" class="password-toggle" id="password-toggle">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                            
+                            <!-- Password Rules -->
+                            <div class="password-rules" id="password-rules">
+                                <h5>Password must contain:</h5>
+                                <ul class="rule-list">
+                                    <li class="rule-item">
+                                        <span class="rule-icon pending" id="rule-length">?</span>
+                                        <span class="rule-text">At least 9 characters</span>
+                                    </li>
+                                    <li class="rule-item">
+                                        <span class="rule-icon pending" id="rule-uppercase">?</span>
+                                        <span class="rule-text">1 uppercase letter (A-Z)</span>
+                                    </li>
+                                    <li class="rule-item">
+                                        <span class="rule-icon pending" id="rule-lowercase">?</span>
+                                        <span class="rule-text">1 lowercase letter (a-z)</span>
+                                    </li>
+                                    <li class="rule-item">
+                                        <span class="rule-icon pending" id="rule-number">?</span>
+                                        <span class="rule-text">1 number (0-9)</span>
+                                    </li>
+                                    <li class="rule-item">
+                                        <span class="rule-icon pending" id="rule-special">?</span>
+                                        <span class="rule-text">1 special character (@$!%*?&)</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Password Strength Meter -->
+                            <div class="password-strength" id="password-strength" style="display: none;">
+                                <div class="strength-meter">
+                                    <div class="strength-bar" id="strength-bar"></div>
+                                </div>
+                                <div class="strength-text" id="strength-text">Password Strength: Weak</div>
+                            </div>
                         </div>
+                        
                         <div class="form-group">
                             <label for="confirm-password">Confirm Password</label>
                             <div class="password-container">
-                                <input type="password" id="confirm-password" placeholder="Confirm your password" required minlength="6">
+                                <input type="password" id="confirm-password" placeholder="Confirm your password" required minlength="8">
                                 <button type="button" class="password-toggle" id="confirm-password-toggle">
                                     <i class="fas fa-eye"></i>
                                 </button>
+                            </div>
+                            
+                            <!-- Password Match Indicator -->
+                            <div class="password-match" id="password-match" style="display: none; margin-top: 10px; font-size: 0.85rem;">
+                                <span id="match-icon" style="margin-right: 5px;"></span>
+                                <span id="match-text"></span>
                             </div>
                         </div>
                     </div>
@@ -1072,6 +1219,20 @@
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirm-password');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // Password Rules Elements
+        const ruleLength = document.getElementById('rule-length');
+        const ruleUppercase = document.getElementById('rule-uppercase');
+        const ruleLowercase = document.getElementById('rule-lowercase');
+        const ruleNumber = document.getElementById('rule-number');
+        const ruleSpecial = document.getElementById('rule-special');
+        const passwordStrength = document.getElementById('password-strength');
+        const strengthBar = document.getElementById('strength-bar');
+        const strengthText = document.getElementById('strength-text');
+        const passwordMatch = document.getElementById('password-match');
+        const matchIcon = document.getElementById('match-icon');
+        const matchText = document.getElementById('match-text');
 
         // Password Toggles
         const passwordToggle = document.getElementById('password-toggle');
@@ -1091,6 +1252,16 @@
             issueDate: '',
             email: '',
             password: ''
+        };
+
+        // Password Validation State
+        let passwordValidation = {
+            length: false,
+            uppercase: false,
+            lowercase: false,
+            number: false,
+            special: false,
+            allValid: false
         };
 
         // Current Step
@@ -1130,6 +1301,10 @@
             passwordToggle.addEventListener('click', () => togglePassword('password'));
             confirmPasswordToggle.addEventListener('click', () => togglePassword('confirm-password'));
 
+            // Password Validation Events
+            passwordInput.addEventListener('input', validatePassword);
+            confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+            
             // Form Submission
             document.getElementById('step4-form').addEventListener('submit', handleSubmit);
 
@@ -1158,6 +1333,133 @@
             } else {
                 input.type = 'password';
                 toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
+
+        // Validate password in real-time
+        function validatePassword() {
+            const password = passwordInput.value;
+            
+            // Check each rule
+            const lengthValid = password.length >= 8;
+            const uppercaseValid = /[A-Z]/.test(password);
+            const lowercaseValid = /[a-z]/.test(password);
+            const numberValid = /[0-9]/.test(password);
+            const specialValid = /[@$!%*?&]/.test(password);
+            
+            // Update validation state
+            passwordValidation.length = lengthValid;
+            passwordValidation.uppercase = uppercaseValid;
+            passwordValidation.lowercase = lowercaseValid;
+            passwordValidation.number = numberValid;
+            passwordValidation.special = specialValid;
+            passwordValidation.allValid = lengthValid && uppercaseValid && lowercaseValid && numberValid && specialValid;
+            
+            // Update rule icons
+            updateRuleIcon(ruleLength, lengthValid);
+            updateRuleIcon(ruleUppercase, uppercaseValid);
+            updateRuleIcon(ruleLowercase, lowercaseValid);
+            updateRuleIcon(ruleNumber, numberValid);
+            updateRuleIcon(ruleSpecial, specialValid);
+            
+            // Update password strength
+            updatePasswordStrength(password);
+            
+            // Enable/disable submit button based on password validity
+            updateSubmitButton();
+            
+            // Also validate password match
+            validatePasswordMatch();
+        }
+
+        // Update rule icon
+        function updateRuleIcon(element, isValid) {
+            if (element) {
+                if (isValid) {
+                    element.className = 'rule-icon valid';
+                    element.innerHTML = '✓';
+                } else {
+                    element.className = 'rule-icon invalid';
+                    element.innerHTML = '✗';
+                }
+            }
+        }
+
+        // Update password strength indicator
+        function updatePasswordStrength(password) {
+            let strength = 0;
+            let strengthLevel = '';
+            
+            if (password.length > 0) {
+                passwordStrength.style.display = 'block';
+                
+                // Calculate strength
+                if (password.length >= 8) strength += 1;
+                if (/[A-Z]/.test(password)) strength += 1;
+                if (/[a-z]/.test(password)) strength += 1;
+                if (/[0-9]/.test(password)) strength += 1;
+                if (/[@$!%*?&]/.test(password)) strength += 1;
+                
+                // Set strength level
+                if (strength <= 1) {
+                    strengthLevel = 'weak';
+                    strengthBar.className = 'strength-bar weak';
+                    strengthText.textContent = 'Password Strength: Weak';
+                    strengthText.style.color = '#e74c3c';
+                } else if (strength === 2) {
+                    strengthLevel = 'fair';
+                    strengthBar.className = 'strength-bar fair';
+                    strengthText.textContent = 'Password Strength: Fair';
+                    strengthText.style.color = '#f39c12';
+                } else if (strength === 3) {
+                    strengthLevel = 'good';
+                    strengthBar.className = 'strength-bar good';
+                    strengthText.textContent = 'Password Strength: Good';
+                    strengthText.style.color = '#3498db';
+                } else if (strength >= 4) {
+                    strengthLevel = 'strong';
+                    strengthBar.className = 'strength-bar strong';
+                    strengthText.textContent = 'Password Strength: Strong';
+                    strengthText.style.color = '#27ae60';
+                }
+            } else {
+                passwordStrength.style.display = 'none';
+            }
+        }
+
+        // Validate password match
+        function validatePasswordMatch() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (confirmPassword.length > 0) {
+                passwordMatch.style.display = 'block';
+                
+                if (password === confirmPassword && password.length > 0) {
+                    matchIcon.innerHTML = '✓';
+                    matchIcon.style.color = '#27ae60';
+                    matchText.textContent = 'Passwords match';
+                    matchText.style.color = '#27ae60';
+                } else if (password.length > 0) {
+                    matchIcon.innerHTML = '✗';
+                    matchIcon.style.color = '#e74c3c';
+                    matchText.textContent = 'Passwords do not match';
+                    matchText.style.color = '#e74c3c';
+                }
+            } else {
+                passwordMatch.style.display = 'none';
+            }
+        }
+
+        // Update submit button state
+        function updateSubmitButton() {
+            const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
+            const confirmPasswordValid = confirmPasswordInput.value.length >= 8;
+            
+            if (passwordValidation.allValid && passwordsMatch && confirmPasswordValid) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
             }
         }
 
@@ -1417,13 +1719,24 @@
             // Save step 4 data
             saveCurrentStepData();
             
-            // Validate all data
+            // Validate all data including password rules
             if (!validateAllData()) {
                 return;
             }
             
+            // Check if password meets all requirements
+            if (!passwordValidation.allValid) {
+                showMessage('Please make sure your password meets all the requirements.', 'error');
+                return;
+            }
+            
+            // Check if passwords match
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                showMessage('Passwords do not match. Please confirm your password.', 'error');
+                return;
+            }
+            
             // Disable submit button
-            const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             
@@ -1502,7 +1815,7 @@
             }
         }
 
-        // Validate all form data
+        // Validate all form data including password rules
         function validateAllData() {
             // Check if all required fields are filled
             for (const [key, value] of Object.entries(userData)) {
@@ -1520,9 +1833,9 @@
                 return false;
             }
             
-            // Validate password
-            if (userData.password.length < 6) {
-                showMessage('Password must be at least 6 characters long', 'error');
+            // Validate password requirements
+            if (!passwordValidation.allValid) {
+                showMessage('Please make sure your password meets all the requirements.', 'error');
                 passwordInput.focus();
                 return false;
             }
@@ -1644,6 +1957,27 @@
             passwordInput.value = '';
             confirmPasswordInput.value = '';
             
+            // Reset password validation
+            passwordValidation = {
+                length: false,
+                uppercase: false,
+                lowercase: false,
+                number: false,
+                special: false,
+                allValid: false
+            };
+            
+            // Reset rule icons
+            updateRuleIcon(ruleLength, false);
+            updateRuleIcon(ruleUppercase, false);
+            updateRuleIcon(ruleLowercase, false);
+            updateRuleIcon(ruleNumber, false);
+            updateRuleIcon(ruleSpecial, false);
+            
+            // Hide password strength and match indicators
+            passwordStrength.style.display = 'none';
+            passwordMatch.style.display = 'none';
+            
             // Reset dates
             setDefaultDates();
             
@@ -1652,6 +1986,9 @@
             confirmPasswordInput.type = 'password';
             passwordToggle.innerHTML = '<i class="fas fa-eye"></i>';
             confirmPasswordToggle.innerHTML = '<i class="fas fa-eye"></i>';
+            
+            // Enable submit button
+            submitBtn.disabled = false;
         }
 
         // Set default dates
