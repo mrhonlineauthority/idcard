@@ -282,6 +282,7 @@
             margin-top: 30px;
             padding-top: 30px;
             border-top: 1px solid #eee;
+            flex-wrap: wrap;
         }
 
         .action-btn {
@@ -308,6 +309,24 @@
             background: linear-gradient(90deg, #2980b9, #1c5a80);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-btn {
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(90deg, #219653, #27ae60);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
         }
 
         .logout-btn {
@@ -639,6 +658,91 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Download Status Message */
+        .download-status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .download-available {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .download-unavailable {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffcc80;
+        }
+
+        /* Expiration Countdown Timer */
+        .expiration-timer {
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: 500;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .expiration-valid {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .expiration-expired {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .expiration-warning {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffcc80;
+        }
+
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px 12px;
+            border-radius: 5px;
+            min-width: 70px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .countdown-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-top: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
@@ -688,10 +792,34 @@
             .id-number {
                 font-size: 1rem;
             }
+            
+            .countdown-container {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .countdown-item {
+                min-width: 60px;
+                padding: 6px 8px;
+            }
+            
+            .countdown-value {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-id-card logo-icon"></i>
+                <div>
+                    <h1>MRH ID Card System</h1>
+                    <h2 id="page-subtitle">ID Card System - Login</h2>
+                </div>
+            </div>
+        </div>
 
         <!-- Message Display -->
         <div class="message" id="message"></div>
@@ -726,6 +854,7 @@
                     </form>
                     
                     <div class="forgot-password">
+                        <!-- Forgot password link can be added here -->
                     </div>
                 </div>
             </div>
@@ -799,14 +928,36 @@
                                 <td><strong>Upazila</strong></td>
                                 <td id="profile-upazila">-</td>
                             </tr>
+                            <!-- New Expiration Date Row -->
+                            <tr>
+                                <td><strong>Expiration Date</strong></td>
+                                <td id="profile-expiration-date">-</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Expiration Countdown Timer -->
+                <div class="expiration-timer" id="expiration-timer">
+                    <div id="timer-message"></div>
+                    <div class="countdown-container" id="countdown-container">
+                        <!-- Countdown items will be inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Download Status Message -->
+                <div class="download-status" id="download-status"></div>
                 
                 <div class="profile-actions">
                     <button class="action-btn preview-btn" id="preview-card-btn">
                         <i class="fas fa-eye"></i> Preview Card
                     </button>
+                    
+                    <!-- New Download Card Button -->
+                    <button class="action-btn download-btn" id="download-card-btn" disabled>
+                        <i class="fas fa-download"></i> Download Card
+                    </button>
+                    
                     <button class="action-btn logout-btn" id="logout-btn">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
@@ -875,6 +1026,10 @@
         const profilePage = document.getElementById('profile-page');
         const messageDiv = document.getElementById('message');
         const pageSubtitle = document.getElementById('page-subtitle');
+        const downloadStatus = document.getElementById('download-status');
+        const expirationTimer = document.getElementById('expiration-timer');
+        const timerMessage = document.getElementById('timer-message');
+        const countdownContainer = document.getElementById('countdown-container');
         
         // Login elements
         const loginForm = document.getElementById('login-form');
@@ -898,7 +1053,9 @@
         const profileDivision = document.getElementById('profile-division');
         const profileDistrict = document.getElementById('profile-district');
         const profileUpazila = document.getElementById('profile-upazila');
+        const profileExpirationDate = document.getElementById('profile-expiration-date');
         const previewCardBtn = document.getElementById('preview-card-btn');
+        const downloadCardBtn = document.getElementById('download-card-btn');
         const logoutBtn = document.getElementById('logout-btn');
         
         // Modal elements
@@ -910,6 +1067,8 @@
         // Current user data
         let currentUserData = null;
         let currentUserId = null;
+        let currentDownloadLink = null;
+        let countdownInterval = null;
 
         // Password toggle functionality
         function setupPasswordToggle(inputId, toggleBtn) {
@@ -956,6 +1115,19 @@
 
         // Format date
         function formatDate(dateString) {
+            if (!dateString) return 'Not Provided';
+            
+            // If it's a timestamp object (from Firebase)
+            if (typeof dateString === 'object' && dateString.seconds) {
+                const date = new Date(dateString.seconds * 1000);
+                return date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            }
+            
+            // If it's a string
             const date = new Date(dateString);
             if (!isNaN(date.getTime())) {
                 return date.toLocaleDateString('en-US', { 
@@ -965,6 +1137,192 @@
                 });
             }
             return dateString;
+        }
+
+        // Calculate time difference for countdown - FIXED VERSION
+        function calculateTimeDifference(expirationDateString) {
+            if (!expirationDateString) return null;
+            
+            const today = new Date();
+            const expirationDate = new Date(expirationDateString);
+            
+            // Set expiration date to end of day (23:59:59.999)
+            expirationDate.setHours(23, 59, 59, 999);
+            
+            // Calculate total time difference in milliseconds
+            const totalDiff = expirationDate.getTime() - today.getTime();
+            
+            if (totalDiff <= 0) {
+                return { expired: true };
+            }
+            
+            // Calculate total seconds
+            const totalSeconds = Math.floor(totalDiff / 1000);
+            
+            // Calculate years, months, days, hours, minutes, seconds
+            const years = Math.floor(totalSeconds / (365.25 * 24 * 60 * 60));
+            const months = Math.floor((totalSeconds % (365.25 * 24 * 60 * 60)) / (30.44 * 24 * 60 * 60));
+            const days = Math.floor((totalSeconds % (30.44 * 24 * 60 * 60)) / (24 * 60 * 60));
+            const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+            const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+            const seconds = totalSeconds % 60;
+            
+            return {
+                expired: false,
+                years,
+                months,
+                days,
+                hours,
+                minutes,
+                seconds,
+                totalDiff,
+                totalSeconds
+            };
+        }
+
+        // Create countdown HTML
+        function createCountdownHTML(timeDiff) {
+            if (!timeDiff || timeDiff.expired) return '';
+            
+            let html = '';
+            
+            // Show years if more than 0
+            if (timeDiff.years > 0) {
+                html += `
+                    <div class="countdown-item">
+                        <div class="countdown-value">${timeDiff.years}</div>
+                        <div class="countdown-label">${timeDiff.years === 1 ? 'Year' : 'Years'}</div>
+                    </div>
+                `;
+            }
+            
+            // Show months if more than 0
+            if (timeDiff.months > 0 || timeDiff.years > 0) {
+                html += `
+                    <div class="countdown-item">
+                        <div class="countdown-value">${timeDiff.months}</div>
+                        <div class="countdown-label">${timeDiff.months === 1 ? 'Month' : 'Months'}</div>
+                    </div>
+                `;
+            }
+            
+            // Always show days
+            html += `
+                <div class="countdown-item">
+                    <div class="countdown-value">${timeDiff.days}</div>
+                    <div class="countdown-label">${timeDiff.days === 1 ? 'Day' : 'Days'}</div>
+                </div>
+            `;
+            
+            // Show hours and minutes if less than 60 days remaining
+            if (timeDiff.days < 60 || timeDiff.days < 30) {
+                html += `
+                    <div class="countdown-item">
+                        <div class="countdown-value">${timeDiff.hours.toString().padStart(2, '0')}</div>
+                        <div class="countdown-label">Hours</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-value">${timeDiff.minutes.toString().padStart(2, '0')}</div>
+                        <div class="countdown-label">Minutes</div>
+                    </div>
+                `;
+            }
+            
+            return html;
+        }
+
+        // Update countdown timer
+        function updateCountdownTimer(expirationDateString) {
+            if (!expirationDateString || !expirationTimer || !timerMessage || !countdownContainer) {
+                return;
+            }
+            
+            const timeDiff = calculateTimeDifference(expirationDateString);
+            
+            if (!timeDiff) {
+                expirationTimer.style.display = 'none';
+                return;
+            }
+            
+            if (timeDiff.expired) {
+                timerMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> ID Card has expired';
+                expirationTimer.className = 'expiration-timer expiration-expired';
+                countdownContainer.innerHTML = '';
+                expirationTimer.style.display = 'block';
+                
+                // Clear interval if expired
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+                return;
+            }
+            
+            // Set message and style based on remaining time
+            const totalDays = timeDiff.days + (timeDiff.months * 30.44) + (timeDiff.years * 365.25);
+            
+            if (totalDays <= 7) {
+                timerMessage.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ID Card expires soon!';
+                expirationTimer.className = 'expiration-timer expiration-warning';
+            } else if (totalDays <= 30) {
+                timerMessage.innerHTML = '<i class="fas fa-clock"></i> ID Card expires soon';
+                expirationTimer.className = 'expiration-timer expiration-warning';
+            } else {
+                timerMessage.innerHTML = '<i class="fas fa-calendar-check"></i> ID Card validity';
+                expirationTimer.className = 'expiration-timer expiration-valid';
+            }
+            
+            // Update countdown display
+            countdownContainer.innerHTML = createCountdownHTML(timeDiff);
+            expirationTimer.style.display = 'block';
+            
+            // Start countdown interval if not already started
+            if (!countdownInterval) {
+                // Update every second for real-time countdown
+                countdownInterval = setInterval(() => {
+                    updateCountdownTimer(expirationDateString);
+                }, 1000); // Update every second
+            }
+        }
+
+        // Update download button based on link availability
+        function updateDownloadButton(downloadLink) {
+            if (!downloadCardBtn) return;
+            
+            if (downloadLink && downloadLink.trim() !== '') {
+                // Enable download button
+                downloadCardBtn.disabled = false;
+                downloadCardBtn.title = "Click to download your ID Card";
+                
+                // Set up click event to open the download link
+                downloadCardBtn.onclick = function() {
+                    window.open(downloadLink, '_blank');
+                    showMessage('Opening download link...', 'info');
+                    
+                    // Track download in console (you can add Firebase analytics here)
+                    console.log(`User ${currentUserId} downloading from: ${downloadLink}`);
+                };
+                
+                // Update status message
+                downloadStatus.textContent = '✓ Your ID Card is ready for download';
+                downloadStatus.className = 'download-status download-available';
+                downloadStatus.style.display = 'block';
+                
+                // Store download link
+                currentDownloadLink = downloadLink;
+            } else {
+                // Disable download button
+                downloadCardBtn.disabled = true;
+                downloadCardBtn.title = "Download link not available. Please contact MRH Authority.";
+                downloadCardBtn.onclick = null;
+                
+                // Update status message
+                downloadStatus.textContent = '✗ ID Card download link is not available. Please contact MRH Authority.';
+                downloadStatus.className = 'download-status download-unavailable';
+                downloadStatus.style.display = 'block';
+                
+                currentDownloadLink = null;
+            }
         }
 
         // Update profile display
@@ -1001,16 +1359,99 @@
                 updateIfExists(profileDistrict, userData.district);
                 updateIfExists(profileUpazila, userData.upazila);
                 
+                // Check for expiration date in user data
+                let expirationDate = null;
+                
+                // Check various possible field names for expiration date
+                const possibleFieldNames = [
+                    'expirationDate',
+                    'expirationdate',
+                    'expiryDate',
+                    'expirydate',
+                    'validUntil',
+                    'validuntil',
+                    'expires',
+                    'cardExpiration',
+                    'cardexpiration'
+                ];
+                
+                for (const fieldName of possibleFieldNames) {
+                    if (userData[fieldName] && userData[fieldName].trim() !== '') {
+                        expirationDate = userData[fieldName];
+                        console.log(`Found expiration date in field: ${fieldName}`, expirationDate);
+                        break;
+                    }
+                }
+                
+                // Update expiration date display
+                if (profileExpirationDate) {
+                    profileExpirationDate.textContent = expirationDate ? formatDate(expirationDate) : '-';
+                }
+                
+                // Update countdown timer
+                updateCountdownTimer(expirationDate);
+                
                 // Store current user data
                 currentUserData = userData;
                 currentUserId = userId;
+                
+                // Check for download link in user data
+                // Look for common field names that might contain download links
+                let downloadLink = null;
+                
+                // Check various possible field names for download link
+                const downloadFieldNames = [
+                    'idcarddownloadlink', 
+                    'idcardbownloadlink',
+                    'downloadLink',
+                    'idCardDownloadLink',
+                    'cardDownloadLink',
+                    'fileLink',
+                    'documentLink',
+                    'id_card_download_link',
+                    'card_link',
+                    'download_url'
+                ];
+                
+                for (const fieldName of downloadFieldNames) {
+                    if (userData[fieldName] && userData[fieldName].trim() !== '') {
+                        downloadLink = userData[fieldName];
+                        console.log(`Found download link in field: ${fieldName}`, downloadLink);
+                        break;
+                    }
+                }
+                
+                // Update download button
+                updateDownloadButton(downloadLink);
+                
             } catch (error) {
                 console.error('Error updating profile display:', error);
             }
         }
 
-        // Create ID Card HTML for preview
+        // Create ID Card HTML for preview - Validity Remaining REMOVED as requested
         function createIDCardHTML(userData, userId) {
+            // Get expiration date
+            let expirationDate = null;
+            const possibleFieldNames = [
+                'expirationDate',
+                'expirationdate',
+                'expiryDate',
+                'expirydate',
+                'validUntil',
+                'validuntil',
+                'expires',
+                'cardExpiration',
+                'cardexpiration'
+            ];
+            
+            for (const fieldName of possibleFieldNames) {
+                if (userData[fieldName] && userData[fieldName].trim() !== '') {
+                    expirationDate = userData[fieldName];
+                    break;
+                }
+            }
+            
             return `
                 <div class="id-card-header">
                     <h3>M.R.H Online Registration Authority</h3>
@@ -1061,12 +1502,15 @@
                         <div class="id-card-value">${userData.upazila || 'Not Provided'}</div>
                     </div>
                     <div class="id-card-field">
-                        <div class="id-card-label">Issue Date</div>
-                        <div class="id-card-value">${formatDate(userData.issueDate) || formatDate(new Date().toISOString())}</div>
-                    </div>
-                    <div class="id-card-field">
                         <div class="id-card-label">Registration Date</div>
                         <div class="id-card-value">${formatDate(userData.registrationDate) || 'Not Provided'}</div>
+                    </div>
+                    <!-- Expiration Date Field (Validity Remaining removed as requested) -->
+                    <div class="id-card-field">
+                        <div class="id-card-label">Expiration Date</div>
+                        <div class="id-card-value">
+                            ${expirationDate ? formatDate(expirationDate) : 'Not Provided'}
+                        </div>
                     </div>
                 </div>
                 <div style="text-align: center; margin-top: 15px; color: #7f8c8d; font-size: 0.85rem; line-height: 1.2;">
@@ -1201,12 +1645,36 @@
             idCardModal.classList.remove('active');
         });
 
-        // Logout - FIXED VERSION
+        // Logout
         logoutBtn.addEventListener('click', async () => {
             try {
                 await signOut(auth);
                 currentUserData = null;
                 currentUserId = null;
+                currentDownloadLink = null;
+                
+                // Clear countdown interval
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+                
+                // Reset download button
+                if (downloadCardBtn) {
+                    downloadCardBtn.disabled = true;
+                    downloadCardBtn.onclick = null;
+                    downloadCardBtn.title = "";
+                }
+                
+                // Hide download status
+                if (downloadStatus) {
+                    downloadStatus.style.display = 'none';
+                }
+                
+                // Hide expiration timer
+                if (expirationTimer) {
+                    expirationTimer.style.display = 'none';
+                }
                 
                 // Show success message first
                 showMessage('Logged out successfully', 'success');
