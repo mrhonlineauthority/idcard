@@ -1118,6 +1118,11 @@
                             <div class="card-label">Email</div>
                             <div class="card-value" id="card-email">Not Provided</div>
                         </div>
+                        <!-- New Expiration Date Field -->
+                        <div class="card-field">
+                            <div class="card-label">Expiration Date</div>
+                            <div class="card-value" id="card-expiration-date">Not Provided</div>
+                        </div>
                     </div>
                     
                     <!-- Registration Complete Message -->
@@ -1712,7 +1717,15 @@
             }
         }
 
-        // Handle form submission - UPDATED VERSION
+        // Function to calculate expiration date (1 year from registration)
+        function calculateExpirationDate() {
+            const today = new Date();
+            const expirationDate = new Date(today);
+            expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+            return expirationDate.toISOString().split('T')[0];
+        }
+
+        // Handle form submission - UPDATED VERSION with Expiration Date
         async function handleSubmit(e) {
             e.preventDefault();
             
@@ -1774,13 +1787,21 @@
                         // Remove password before storing in database
                         const { password, ...userDataWithoutPassword } = userData;
                         
+                        // Calculate registration date and expiration date
+                        const registrationDate = new Date().toISOString();
+                        const expirationDate = calculateExpirationDate();
+                        
                         // Store user data in Realtime Database
                         const userRef = ref(database, `users/${userId}`);
                         await set(userRef, {
                             ...userDataWithoutPassword,
                             firebaseUID: userCredential.user.uid,
-                            registrationDate: new Date().toISOString()
+                            registrationDate: registrationDate,
+                            expirationDate: expirationDate  // NEW: Add expiration date field
                         });
+                        
+                        // Add expiration date to userData for display
+                        userDataWithoutPassword.expirationDate = expirationDate;
                         
                         // Display the ID card
                         displayIDCard(userDataWithoutPassword, userId, false);
@@ -1789,7 +1810,7 @@
                         resetForm();
                         
                         // Show success message
-                        showMessage('Registration successful! Your ID card has been created.', 'success');
+                        showMessage('Registration successful! Your ID card has been created with 1 year validity.', 'success');
                         
                     } catch (authError) {
                         // Handle Firebase Authentication errors
@@ -1887,6 +1908,19 @@
 
         // Format date for display
         function formatDate(dateString) {
+            if (!dateString) return 'Not Provided';
+            
+            // If it's a timestamp object (from Firebase)
+            if (typeof dateString === 'object' && dateString.seconds) {
+                const date = new Date(dateString.seconds * 1000);
+                return date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            }
+            
+            // If it's a string
             const date = new Date(dateString);
             if (!isNaN(date.getTime())) {
                 return date.toLocaleDateString('en-US', { 
@@ -1898,7 +1932,7 @@
             return dateString;
         }
 
-        // Display ID card - UPDATED
+        // Display ID card - UPDATED with Expiration Date
         function displayIDCard(userData, userId, isExisting = false) {
             // Update card elements
             document.getElementById('card-name').textContent = userData.name || 'Not Provided';
@@ -1912,6 +1946,10 @@
             document.getElementById('card-dob').textContent = formatDate(userData.dob) || 'Not Provided';
             document.getElementById('card-issue-date').textContent = formatDate(userData.issueDate) || 'Not Provided';
             document.getElementById('card-email').textContent = userData.email || 'Not Provided';
+            
+            // NEW: Display expiration date
+            document.getElementById('card-expiration-date').textContent = userData.expirationDate ? formatDate(userData.expirationDate) : 'Not Provided';
+            
             document.getElementById('card-id').textContent = `ID: ${userId}`;
             
             // Update registration complete message based on whether it's existing or new
@@ -1920,7 +1958,7 @@
                 registrationMessage.innerHTML = 'This email is already registered. This is your existing ID card. If you want to access your account, click on the Login ID Card button.';
             } else {
                 registrationStatus.textContent = 'Registration Complete!';
-                registrationMessage.innerHTML = 'Welcome, your registration is complete! If you want to save your ID card, click on the Login ID Card button, log in to your account, and save your ID card.';
+                registrationMessage.innerHTML = 'Welcome, your registration is complete! Your ID card is valid for 1 year from today. If you want to save your ID card, click on the Login ID Card button, log in to your account, and save your ID card.';
             }
             
             // Switch to ID card page
