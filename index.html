@@ -386,6 +386,7 @@
                 <div class="btn-text">ID Card Login</div>
             </a>
             
+            <!-- ID Card Renewal Button - Updated link to idcardrenewalform.html -->
             <a href="https://mrhonlineauthority.github.io/idcard/idcardrenewalform.html" class="btn" id="btn-3">
                 <div class="btn-icon">
                     <i class="fas fa-redo"></i>
@@ -462,11 +463,9 @@
             slideTimer = setInterval(nextSlide, slideInterval);
         });
         
-        // Handle button 3 (ID Card Recovery) - currently not linked
-        document.getElementById('btn-3').addEventListener('click', function(e) {
-            e.preventDefault();
-            alert("ID Card Recovery feature is currently under development. It will be available soon.");
-        });
+        // Ensure Renewal button works natively with its href - no extra alert because link is now active
+        // All buttons are standard anchor links, so they navigate directly.
+        // No additional JavaScript intervention needed for btn-3 as the correct URL is set in href.
         
         // Handle image loading errors with better fallbacks
         const images = ['logo-img', 'slide-img-1', 'slide-img-2'];
